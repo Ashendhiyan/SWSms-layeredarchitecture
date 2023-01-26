@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="600.0" prefWidth="821.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.SpiceWholesaleShop.controller.LoginViewController">
+   <children>
+      <ImageView fitHeight="668.0" fitWidth="903.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/img_2.png" />
+         </image>
+         <effect>
+            <Blend mode="LIGHTEN" />
+         </effect>
+      </ImageView>
+      <ImageView fitHeight="65.0" fitWidth="163.0" layoutX="190.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/images.png" />
+         </image>
+      </ImageView>
+      <JFXTextField focusColor="#020e11" layoutX="127.0" layoutY="239.0" prefHeight="34.0" prefWidth="233.0" promptText="            Username" style="-fx-background-color: white;" unFocusColor="#020e11">
+         <opaqueInsets>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </opaqueInsets>
+         <cursor>
+            <Cursor fx:constant="DISAPPEAR" />
+         </cursor>
+      </JFXTextField>
+      <JFXPasswordField focusColor="#020e11" layoutX="127.0" layoutY="316.0" prefHeight="34.0" prefWidth="233.0" promptText="           Password" style="-fx-background-color: white;" unFocusColor="#626d70" />
+      <Label layoutX="82.0" layoutY="96.0" text="Welcome Back.." textFill="#2c2c54">
+         <font>
+            <Font name="Gill Sans Ultra Bold" size="33.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="17.0" fitWidth="16.0" layoutX="135.0" layoutY="248.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/Log%20User.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="17.0" fitWidth="16.0" layoutX="135.0" layoutY="325.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/Lock.png" />
+         </image>
+      </ImageView>
+      <Line endX="25.0" endY="44.0" layoutX="135.0" layoutY="199.0" startX="25.0" startY="70.0" />
+      <Line endX="25.0" endY="44.0" layoutX="135.0" layoutY="276.0" startX="25.0" startY="70.0" />
+      <JFXButton layoutX="181.0" layoutY="390.0" prefHeight="34.0" prefWidth="125.0" style="-fx-background-color: #34ace0;" text="Log in" textFill="WHITE">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="Century Gothic Bold" size="17.0" />
+         </font>
+      </JFXButton>
+   </children>
+</AnchorPane>

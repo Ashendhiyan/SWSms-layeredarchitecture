@@ -1,0 +1,324 @@
+package lk.ijse.SpiceWholesaleShop.controller;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import lk.ijse.SpiceWholesaleShop.model.SpiceModel;
+import lk.ijse.SpiceWholesaleShop.to.Employees;
+import lk.ijse.SpiceWholesaleShop.to.Spice;
+import lk.ijse.SpiceWholesaleShop.util.Navigation;
+import lk.ijse.SpiceWholesaleShop.util.Routes;
+import lk.ijse.SpiceWholesaleShop.util.Service;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class ChashierSpiceFormController {
+    public AnchorPane PurchaseProduct;
+    public TextField txtId;
+    public TextField txtDescription;
+    public TextField txtQtyOnHand;
+    public TextField txtUnitPrice;
+    public TextField IdSearch;
+    public TextField txtPurchasePrice;
+    public TableView<Spice> tblProduct;
+    public TableColumn<Spice,String> colProductid;
+    public TableColumn<Spice,String> colDiscription;
+    public TableColumn<Spice,Double> colPurchasePrice;
+    public TableColumn<Spice,Integer> colQtyOnhand;
+    public TableColumn<Spice,Double> colUnitPrice;
+    public Button btnAddDisable;
+
+    boolean isMatchDescription = false;
+    boolean isMatchProductId = false;
+    boolean isMatchQtyOnHand = false;
+    boolean isMatchUnitPrice = false;
+    boolean isMatchPurchasePrice = false;
+
+    public void initialize(){
+        loadTableData();
+    }
+
+    private void loadTableData() {
+        refreshTableData();
+        colProductid.setCellValueFactory(new PropertyValueFactory<>("itemCode"));
+        colPurchasePrice.setCellValueFactory(new PropertyValueFactory<>("purchasePrice"));
+        colUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        colQtyOnhand.setCellValueFactory(new PropertyValueFactory<>("qtyOnHand"));
+        colDiscription.setCellValueFactory(new PropertyValueFactory<>("description"));
+    }
+
+    private void refreshTableData() {
+        try {
+            ArrayList<Spice> product=SpiceModel.getAllproduct();
+            ObservableList<Spice> productObservableList= FXCollections.observableArrayList();
+            productObservableList.addAll(product);
+            tblProduct.setItems(productObservableList);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void btnDashboard(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CASHIERDASH,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnProduct(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CHASHIERPRODUCT,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnEmployees(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CHASHIEREMPLOYEES,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnPurchase(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CHASHIERPURCHASE,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnReports(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CHASHIERREPORT,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnLogout(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.LOGIN,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnUsers(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.USER,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnOders(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CHASHIERORDER,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnCustomer(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CASHIERCUSTOMER,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+
+    public void btnpayment(ActionEvent actionEvent) {
+        try {
+            Navigation.navigate(Routes.CHASHIERBILL,PurchaseProduct);
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
+        }
+    }
+    public void txtProductIdOnAction(KeyEvent keyEvent) {
+        if (Service.isValidProductId(txtId.getText())) {
+            txtId.setStyle("-fx-border-color: green");
+            isMatchProductId = true;
+        } else {
+            txtId.setStyle("-fx-border-color: red");
+            isMatchProductId = false;
+        }
+    }
+
+    public void txtDescriptionOnAction(KeyEvent keyEvent) {
+        if (Service.isValidName(txtDescription.getText())) {
+            txtDescription.setStyle("-fx-border-color: green");
+            isMatchDescription = true;
+        } else {
+            txtDescription.setStyle("-fx-border-color: red");
+            isMatchDescription = false;
+        }
+    }
+
+    public void txtQtyOnAction(KeyEvent keyEvent) {
+        if (Service.QtyOnHand(txtQtyOnHand.getText())) {
+            txtQtyOnHand.setStyle("-fx-border-color: green");
+            isMatchQtyOnHand = true;
+        } else {
+            txtQtyOnHand.setStyle("-fx-border-color: red");
+            isMatchQtyOnHand = false;
+        }
+    }
+
+    public void txtUnitPriceOnAction(KeyEvent keyEvent) {
+        if (Service.isValidPrice(txtUnitPrice.getText())) {
+            txtUnitPrice.setStyle("-fx-border-color: green");
+            isMatchUnitPrice = true;
+        } else {
+            txtUnitPrice.setStyle("-fx-border-color: red");
+            isMatchUnitPrice = false;
+        }
+    }
+
+    public void txtPurchasePrice(KeyEvent keyEvent) {
+        if (Service.isValidPrice(txtPurchasePrice.getText())) {
+            txtPurchasePrice.setStyle("-fx-border-color: green");
+            isMatchPurchasePrice = true;
+        } else {
+            txtPurchasePrice.setStyle("-fx-border-color: red");
+            isMatchPurchasePrice = false;
+        }
+    }
+    public void btnAdd(ActionEvent actionEvent) {
+        if (!isMatchProductId) {
+        } else if (!isMatchDescription) {
+        } else if (!isMatchQtyOnHand) {
+        } else if (!isMatchUnitPrice) {
+        } else if (!isMatchPurchasePrice) {
+        } else {
+            String productId = txtId.getText();
+            String Description = txtDescription.getText();
+            int QtyOnHand = Integer.parseInt(txtQtyOnHand.getText());
+            Double unitPrice = Double.parseDouble(txtUnitPrice.getText());
+            Double purchasePrice = Double.parseDouble(txtPurchasePrice.getText());
+
+            Spice spice = new Spice(productId, purchasePrice, unitPrice, QtyOnHand, Description);
+            boolean isAdded = false;
+            try {
+                isAdded = SpiceModel.Add(spice);
+                refreshTableData();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            if (isAdded) {
+                JOptionPane.showMessageDialog(null, "Product Successfully Added..!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Unsuccessful..!");
+            }
+        }
+    }
+
+    public void btnUpdate(ActionEvent actionEvent) {
+        if (!isMatchProductId) {
+        } else if (!isMatchDescription) {
+        } else if (!isMatchQtyOnHand) {
+        } else if (!isMatchUnitPrice) {
+        } else if (!isMatchPurchasePrice) {
+        } else {
+            String productId = txtId.getText();
+            String Description = txtDescription.getText();
+            int QtyOnHand = Integer.parseInt(txtQtyOnHand.getText());
+            Double unitPrice = Double.parseDouble(txtUnitPrice.getText());
+            Double purchasePrice = Double.parseDouble(txtPurchasePrice.getText());
+
+            Spice spice = new Spice(productId, purchasePrice, unitPrice, QtyOnHand, Description);
+            boolean isUpdated = false;
+            try {
+                isUpdated = SpiceModel.Update(spice);
+                refreshTableData();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            if (isUpdated) {
+                JOptionPane.showMessageDialog(null, "Product Successfully Updated..!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Unsuccessful..!");
+            }
+        }
+    }
+
+    public void btnDelete(ActionEvent actionEvent) {
+        String productId = txtId.getText();
+        try {
+            boolean isDeleted = SpiceModel.Delete(productId);
+            refreshTableData();
+            if (isDeleted){
+                JOptionPane.showMessageDialog(null,"Successfully Deleted..!");
+            }else{
+                JOptionPane.showMessageDialog(null,"Unsuccessful..!");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void txtIdSearch(ActionEvent actionEvent) {
+       btnSearch(actionEvent);
+    }
+
+    public void btnSearch(ActionEvent actionEvent) {
+        String Search = IdSearch.getText();
+        try {
+            Spice spice= SpiceModel.SearchId(Search);
+            if (spice==null){
+                spice= SpiceModel.SearchPurechasePrice(Search);
+                if (spice == null) {
+                    spice= SpiceModel.SearchUnitPrice(Search);
+                    if (spice == null) {
+                        spice= SpiceModel.SearchQtyOnHand(Search);
+                        if (spice==null){
+                            spice= SpiceModel.SearchDescription(Search);
+                        }
+                    }
+                }
+            }
+            if (spice!=null){
+                txtId.setText(spice.getItemCode());
+                txtPurchasePrice.setText(spice.getPurchasePrice()+"");
+                txtUnitPrice.setText(spice.getUnitPrice()+"");
+                txtQtyOnHand.setText(spice.getQtyOnHand()+"");
+                txtDescription.setText(spice.getDescription());
+            }else{
+                new Alert(Alert.AlertType.CONFIRMATION, "Product Not Found..!").show();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void tblProductOnMouseClick(MouseEvent mouseEvent) {
+        Spice spice=tblProduct.getSelectionModel().getSelectedItem();
+        if (spice!=null){
+            txtId.setText(spice.getItemCode());
+            txtPurchasePrice.setText(spice.getPurchasePrice()+"");
+            txtUnitPrice.setText(spice.getUnitPrice()+"");
+            txtQtyOnHand.setText(spice.getQtyOnHand()+"");
+            txtDescription.setText(spice.getDescription());
+            btnAddDisable.setDisable(true);
+        }
+    }
+}
