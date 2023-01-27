@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class AdminBillViewFormController {
     public AnchorPane Bill;
-
+//Bill Form Navigation
     public void btnDashboard(ActionEvent actionEvent) {
         try {
             Navigation.navigate(Routes.DASHBOARD,Bill);
