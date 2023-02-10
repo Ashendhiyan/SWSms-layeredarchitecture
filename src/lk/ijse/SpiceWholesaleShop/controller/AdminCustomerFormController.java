@@ -8,10 +8,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.CustomerModel;
-import lk.ijse.SpiceWholesaleShop.model.SpiceModel;
-import lk.ijse.SpiceWholesaleShop.to.Customer;
-import lk.ijse.SpiceWholesaleShop.to.Spice;
+import lk.ijse.SpiceWholesaleShop.entity.Customer;
+import lk.ijse.SpiceWholesaleShop.service.cutom.CustomerService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.CustomerServiceImpl;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 import lk.ijse.SpiceWholesaleShop.util.Service;
@@ -19,7 +18,7 @@ import lk.ijse.SpiceWholesaleShop.util.Service;
 import javax.swing.*;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class AdminCustomerFormController {
     public AnchorPane Customers;
@@ -44,6 +43,8 @@ public class AdminCustomerFormController {
     boolean isMatchAddress=false;
     boolean isMatchEmail=false;
     boolean isMatchNic=false;
+
+    CustomerService customerService = new CustomerServiceImpl();
     public void initialize(){
         loadTableData();
     }
@@ -60,13 +61,11 @@ public class AdminCustomerFormController {
 
     private void refreshTableData() {
         try {
-            ArrayList<Customer> customer=CustomerModel.getAllCustomer();
+            List<Customer> customer = customerService.findCustomer();
             ObservableList<Customer> CustomerObservableList= FXCollections.observableArrayList();
             CustomerObservableList.addAll(customer);
             tblCustomer.setItems(CustomerObservableList);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -222,12 +221,10 @@ public class AdminCustomerFormController {
             Customer customer = new Customer(CustomerId, name, address, telNo, email, Nic);
             boolean isAdded = false;
             try {
-                isAdded = CustomerModel.Add(customer);
+                isAdded = customerService.saveCustomer(customer);
                 refreshTableData();
                 tblCustomer.refresh();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             if (isAdded) {
@@ -255,11 +252,9 @@ public class AdminCustomerFormController {
             Customer customer = new Customer(CustomerId, name, address, telNo, email, Nic);
             boolean isUpdated = false;
             try {
-                isUpdated = CustomerModel.Update(customer);
+                 isUpdated = customerService.updateCustomer(customer);
                 refreshTableData();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             if (isUpdated) {
@@ -273,7 +268,7 @@ public class AdminCustomerFormController {
     public void btnDelete(ActionEvent actionEvent) {
         String CustomerId = txtId.getText();
         try {
-            boolean isDeleted = CustomerModel.Delete(CustomerId);
+            boolean isDeleted = customerService.deleteCustomer(CustomerId);
             refreshTableData();
             if (isDeleted){
                 JOptionPane.showMessageDialog(null,"Successfully Deleted..!");
@@ -282,43 +277,14 @@ public class AdminCustomerFormController {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 
     public void btnSearch(ActionEvent actionEvent) {
         String Search = txtIdSearch.getText();
         try {
-            Customer customer= CustomerModel.SearchId(Search);
-            if (customer==null){
-                customer= CustomerModel.SearchName(Search);
-                if (customer == null) {
-                    customer= CustomerModel.SearchAddres(Search);
-                    if (customer == null) {
-                        customer= CustomerModel.SearchTelNum(Search);
-                        if (customer==null){
-                            customer= CustomerModel.SearchEmail(Search);
-                            if (customer==null){
-                                customer= CustomerModel.SearchNic(Search);
-                            }
-                        }
-                    }
-                }
-            }
-            if (customer!=null){
-                txtId.setText(customer.getCustomerId());
-                txtName.setText(customer.getName());
-                txtAddress.setText(customer.getAddress());
-                txtTelNo.setText(customer.getTelNumber());
-                txtEmail.setText(customer.getEmail());
-                txtNic.setText(customer.getNic());
-            }else{
-                new Alert(Alert.AlertType.CONFIRMATION, "Customer Not Found..!").show();
-            }
+            List<Customer> customer = customerService.searchCustomer(Search);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

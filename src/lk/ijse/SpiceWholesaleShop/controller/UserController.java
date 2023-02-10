@@ -12,22 +12,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.UserModel;
-import lk.ijse.SpiceWholesaleShop.model.UserModel;
-import lk.ijse.SpiceWholesaleShop.to.Customer;
-import lk.ijse.SpiceWholesaleShop.to.User;
-import lk.ijse.SpiceWholesaleShop.util.CrudUtil;
+import lk.ijse.SpiceWholesaleShop.service.cutom.UserService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.UserServiceImpl;
+import lk.ijse.SpiceWholesaleShop.entity.User;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 import lk.ijse.SpiceWholesaleShop.util.Service;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class UserController extends Component {
     public AnchorPane User;
@@ -59,6 +55,8 @@ public class UserController extends Component {
     boolean isMatchNic=false;
     boolean isMatchRank=false;
     boolean isMatchPassword=false;
+
+    UserService userService=new UserServiceImpl();
 
     public void initialize() {
         loadTableData();
@@ -233,12 +231,10 @@ public class UserController extends Component {
 
             User user = new User(userId, name, password, userRank, email, address, Nic, TelNumber);
             boolean isAdded = false;
-            refreshTableData();
             try {
-                isAdded = UserModel.Add(user);
+                isAdded = userService.saveUser(user);
+                refreshTableData();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             if (isAdded) {
@@ -270,12 +266,10 @@ public class UserController extends Component {
 
             User user = new User(userId, name, password, userRank, email, address, Nic, TelNumber);
             boolean isUpdated = false;
-            refreshTableData();
             try {
-                isUpdated = UserModel.Update(user);
+                isUpdated = userService.updateUser(user);
+                refreshTableData();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             if (isUpdated) {
@@ -287,9 +281,8 @@ public class UserController extends Component {
     }
 
     public void btnDelete(ActionEvent actionEvent) {
-        String id = txtId.getText();
         try {
-            boolean isDeleted = UserModel.Delete(id);
+            boolean isDeleted = userService.deleteUser(txtId.getText());
             refreshTableData();
             if (isDeleted){
                 JOptionPane.showMessageDialog(null,"Successfully Deleted..!");
@@ -297,8 +290,6 @@ public class UserController extends Component {
                 JOptionPane.showMessageDialog(null,"Unsuccessful..!");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -310,43 +301,8 @@ public class UserController extends Component {
     public void txtIdSearch(ActionEvent actionEvent) {
         String Search = txtIdSearch.getText();
         try {
-            User user= UserModel.SearchId(Search);
-            if (user==null){
-                user= UserModel.SearchName(Search);
-                if (user == null) {
-                    user= UserModel.SearchPassword(Search);
-                    if (user == null) {
-                        user= UserModel.SearchRank(Search);
-                        if (user==null){
-                            user= UserModel.SearchEmail(Search);
-                            if (user==null){
-                                user= UserModel.SearchAddress(Search);
-                                if (user==null){
-                                    user= UserModel.SearchNic(Search);
-                                    if (user==null){
-                                        user= UserModel.SearchTelNum(Search);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (user!=null){
-                txtId.setText(user.getUserId());
-                txtUsername.setText(user.getName());
-                txtPassword.setText(user.getPassword());
-                txtRank.setText(user.getUserRank());
-                txtEmail.setText(user.getEmail());
-                txtAddress.setText(user.getAddress());
-                txtNic.setText(user.getNic());
-                txtTel.setText(user.getTelNumber());
-            }else{
-                new Alert(Alert.AlertType.CONFIRMATION, "User Not Found..!").show();
-            }
+            List<User> users = userService.searchUser(Search);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -365,13 +321,11 @@ public class UserController extends Component {
 
     private void refreshTableData() {
         try {
-            ArrayList<User>users=UserModel.getAllUser();
+            List<User> users = userService.findUser();
             ObservableList<User>userObservableList= FXCollections.observableArrayList();
             userObservableList.addAll(users);
             UserTable.setItems(userObservableList);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

@@ -3,17 +3,22 @@ package lk.ijse.SpiceWholesaleShop.to;
 public class CartDetail {
       private String orderId;
       private String itemCode;
+      private String description;
       private int qty;
       private Double unitPrice;
       private Double total;
 
-    public CartDetail(String orderId, String itemCode,  int qty, Double unitPrice, Double total) {
+    public CartDetail(String orderId, String itemCode, String description, int qty, Double unitPrice, Double total) {
         this.orderId = orderId;
         this.itemCode = itemCode;
+        this.description = description;
         this.qty = qty;
         this.unitPrice = unitPrice;
         this.total = total;
     }
+
+    private Double PurchasePrice;
+
 
     public String getOrderId() {
         return orderId;
@@ -29,6 +34,14 @@ public class CartDetail {
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getQty() {

@@ -6,7 +6,9 @@ public class PlaceOrder {
     private String customerId;
     private String orderId;
     private String description;
-    private ArrayList<CartDetail> orderDetails ;
+
+
+    private ArrayList<CartDetail> orderDetails = new ArrayList<>();
 
     public PlaceOrder(String customerId, String orderId,String description, ArrayList<CartDetail> orderDetails) {
         this.customerId = customerId;

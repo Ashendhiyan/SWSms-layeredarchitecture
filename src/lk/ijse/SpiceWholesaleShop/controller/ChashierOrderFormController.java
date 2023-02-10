@@ -7,8 +7,13 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.*;
+import lk.ijse.SpiceWholesaleShop.Dao.custom.PlaceOrderDAO;
+import lk.ijse.SpiceWholesaleShop.Dao.custom.impl.PlaceOrderDAOImpl;
+import lk.ijse.SpiceWholesaleShop.entity.Spice;
+import lk.ijse.SpiceWholesaleShop.service.cutom.OrderService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.OrderFormServiceImpl;
 import lk.ijse.SpiceWholesaleShop.to.*;
+import lk.ijse.SpiceWholesaleShop.entity.Customer;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 import lk.ijse.SpiceWholesaleShop.tm.AddOrderTm;
@@ -42,6 +47,8 @@ public class ChashierOrderFormController {
     public Label lblOrderDate;
     public ComboBox cmbCustomerId;
     public TableColumn colPurchasePrice;
+
+    OrderService orderService=new OrderFormServiceImpl();
     private ObservableList<AddOrderTm> obList = FXCollections.observableArrayList();
 
     public void initialize(){
@@ -145,7 +152,7 @@ public class ChashierOrderFormController {
     public void LoadProductCode(){
         try {
             ObservableList<String> observableList = FXCollections.observableArrayList();
-            ArrayList<String> itemList = SpiceModel.loadItemCodes();
+            ArrayList<String> itemList = orderService.LoadItem();
 
             for (String code : itemList) {
                 observableList.add(code);
@@ -157,7 +164,7 @@ public class ChashierOrderFormController {
     }
     private void loadNextOrderId() {
         try {
-            String orderId = OrderModel.generateNextOrderId();
+            String orderId = orderService.generateOrderId();
             lblOrderId.setText(orderId);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -166,7 +173,7 @@ public class ChashierOrderFormController {
     private void loadCustomerIds() {
         try {
             ObservableList<String> observableList = FXCollections.observableArrayList();
-            ArrayList<String> idList = CustomerModel.loadCustomerIds();
+            ArrayList<String> idList = orderService.loadCustomer();
 
             for (String id : idList) {
                 observableList.add(id);
@@ -197,8 +204,12 @@ public class ChashierOrderFormController {
     public void cmbICustomerOnAction(ActionEvent actionEvent) {
         String code = String.valueOf(cmbCustomerId.getValue());
         try {
-            Customer customer = CustomerModel.SearchId(code);
-            fillCustomerFields(customer);
+            Optional<Customer> customer = orderService.SearchCustomer(code);
+
+            if (customer.isPresent()){
+                customer.get();
+            }
+            fillCustomerFields(customer.get());
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -214,12 +225,13 @@ public class ChashierOrderFormController {
         for (int i = 0; i < tblAddOrder.getItems().size(); i++) {
             /* get each row details to (PlaceOrderTm)lk.ijse.SpiceWholesaleShop.tm in each time and add them to the orderDetails */
             AddOrderTm tm = obList.get(i);
-            cartDetails.add(new CartDetail(orderId, tm.getItemCode(),tm.getQty(), tm.getUnitPrice(),tm.getTotal()));
+            cartDetails.add(new CartDetail(orderId, tm.getItemCode(),tm.getDescription(),tm.getQty(), tm.getUnitPrice(),tm.getTotal()));
         }
 
         PlaceOrder placeOrder = new PlaceOrder(customerId, orderId,description ,cartDetails);
         try {
-            boolean isPlaced = PlaceOrderModel.placeOrder(placeOrder);
+            PlaceOrderDAO placeOrderDAO=new PlaceOrderDAOImpl();
+            boolean isPlaced = placeOrderDAO.placeOrder(placeOrder);
             if (isPlaced) {
                 /* to clear table */
                 obList.clear();
@@ -229,8 +241,6 @@ public class ChashierOrderFormController {
                 new Alert(Alert.AlertType.ERROR, "Order Not Placed!").show();
             }
         } catch (SQLException | ClassNotFoundException e) {
-            System.out.println(e);
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -238,8 +248,12 @@ public class ChashierOrderFormController {
     public void cmbItemOnAction(ActionEvent actionEvent) {
         String code = String.valueOf(cmbItemCode.getValue());
         try {
-            Spice item = SpiceModel.SearchId(code);
-            fillItemFields(item);
+            OrderFormServiceImpl orderFormService = new OrderFormServiceImpl();
+            Optional<Spice> item = orderFormService.SearchSpice(code);
+            if (item.isPresent()){
+                item.get();
+            }
+            fillItemFields(item.get());
             txtQty.requestFocus();
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);

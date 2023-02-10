@@ -8,10 +8,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.CustomerModel;
-import lk.ijse.SpiceWholesaleShop.model.EmployeesModel;
-import lk.ijse.SpiceWholesaleShop.to.Customer;
-import lk.ijse.SpiceWholesaleShop.to.Employees;
+import lk.ijse.SpiceWholesaleShop.entity.Employees;
+import lk.ijse.SpiceWholesaleShop.service.cutom.EmployeeService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.EmployeeServiceImpl;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 import lk.ijse.SpiceWholesaleShop.util.Service;
@@ -19,7 +18,7 @@ import lk.ijse.SpiceWholesaleShop.util.Service;
 import javax.swing.*;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class AdminEmployeeFormController {
     public AnchorPane Employee;
@@ -48,6 +47,8 @@ public class AdminEmployeeFormController {
     boolean isMatchNic=false;
     boolean isMatchRank=false;
 
+    EmployeeService employeeService=new EmployeeServiceImpl();
+
     public void initialize(){
         loadTableData();
     }
@@ -65,13 +66,11 @@ public class AdminEmployeeFormController {
 
     private void refreshTableData() {
         try {
-            ArrayList<Employees> employees=EmployeesModel.getAllEmployee();
+            List<Employees> employees = employeeService.findEmployees();
             ObservableList<Employees> EmplopyeeObservableList= FXCollections.observableArrayList();
             EmplopyeeObservableList.addAll(employees);
             tblEmployee.setItems(EmplopyeeObservableList);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -232,7 +231,7 @@ public class AdminEmployeeFormController {
             String rank = txtRank.getText();
             Employees employees = new Employees(id, rank, name, address, email, nic, telNo);
             try {
-                boolean isAdded = EmployeesModel.Add(employees);
+                boolean isAdded = employeeService.saveEmployees(employees);
                 refreshTableData();
                 if (isAdded) {
                     JOptionPane.showMessageDialog(null, "Employee Successfully Added..!");
@@ -240,8 +239,6 @@ public class AdminEmployeeFormController {
                     JOptionPane.showMessageDialog(null, "Unsuccessful..!");
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -265,7 +262,7 @@ public class AdminEmployeeFormController {
             String telNo = txtTelNo.getText();
             Employees employees = new Employees(id, rank, name, address, email, nic, telNo);
             try {
-                boolean isUpdated = EmployeesModel.Update(employees);
+                boolean isUpdated = employeeService.updateEmployees(employees);
                 refreshTableData();
                 if (isUpdated) {
                     JOptionPane.showMessageDialog(null, "Employee Successfully Updated..!");
@@ -274,8 +271,6 @@ public class AdminEmployeeFormController {
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -283,7 +278,7 @@ public class AdminEmployeeFormController {
     public void btnDelete(ActionEvent actionEvent) {
         String id = EmployeeId.getText();
         try {
-            boolean isDeleted =EmployeesModel.Delete(id);
+            boolean isDeleted = employeeService.deleteEmployees(id);;
             refreshTableData();
             if (isDeleted){
                 JOptionPane.showMessageDialog(null,"Successfully Deleted..!");
@@ -291,8 +286,6 @@ public class AdminEmployeeFormController {
                 JOptionPane.showMessageDialog(null,"Unsuccessful..!");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -302,41 +295,10 @@ public class AdminEmployeeFormController {
     }
 
     public void btnSearch(ActionEvent actionEvent) {
-        String Search = txtIdSearch.getText();
+        String id = txtIdSearch.getText();
         try {
-            Employees employees= EmployeesModel.SearchId(Search);
-            if (employees==null){
-                employees= EmployeesModel.SearchRank(Search);
-                if (employees == null) {
-                    employees= EmployeesModel.SearchName(Search);
-                    if (employees == null) {
-                        employees= EmployeesModel.SearchAddress(Search);
-                        if (employees==null){
-                            employees= EmployeesModel.SearchEmail(Search);
-                            if (employees==null){
-                                employees= EmployeesModel.SearchNic(Search);
-                                if (employees==null){
-                                    employees= EmployeesModel.SearchTelNum(Search);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (employees!=null){
-                EmployeeId.setText(employees.getEmployeeId());
-                txtRank.setText(employees.getRank());
-                txtName.setText(employees.getName());
-                txtAddress.setText(employees.getAddress());
-                txtEmail.setText(employees.getEmail());
-                txtNic.setText(employees.getNic());
-                txtTelNo.setText(employees.getTelNumber());
-            }else{
-                new Alert(Alert.AlertType.CONFIRMATION, "Employee Not Found..!").show();
-            }
+            List<Employees> search = employeeService.searchEmployees(id);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

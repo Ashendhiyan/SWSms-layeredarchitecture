@@ -7,12 +7,11 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.CustomerModel;
-import lk.ijse.SpiceWholesaleShop.model.PurchaseModel;
-import lk.ijse.SpiceWholesaleShop.model.SpiceModel;
+import lk.ijse.SpiceWholesaleShop.service.cutom.PurchaseService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.PurchaseFormServiceImpl;
 import lk.ijse.SpiceWholesaleShop.tm.AddPurchaseTm;
-import lk.ijse.SpiceWholesaleShop.to.Customer;
-import lk.ijse.SpiceWholesaleShop.to.Spice;
+import lk.ijse.SpiceWholesaleShop.entity.Customer;
+import lk.ijse.SpiceWholesaleShop.entity.Spice;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 
@@ -47,6 +46,7 @@ public class ChashierPurchaseFormController {
     public ComboBox cmbItemCode;
 
     private ObservableList<AddPurchaseTm> obList = FXCollections.observableArrayList();
+    PurchaseService purchaseService=new PurchaseFormServiceImpl();
 
     public void initialize(){
         loadOrderDate();
@@ -156,7 +156,7 @@ public class ChashierPurchaseFormController {
     public void LoadProductCode(){
         try {
             ObservableList<String> observableList = FXCollections.observableArrayList();
-            ArrayList<String> itemList = SpiceModel.loadItemCodes();
+            ArrayList<String> itemList = purchaseService.loadItem();
 
             for (String code : itemList) {
                 observableList.add(code);
@@ -168,7 +168,7 @@ public class ChashierPurchaseFormController {
     }
     private void loadNextPurchaseId() {
         try {
-            String purchaseId = PurchaseModel.generateNextPurchaseId();
+            String purchaseId = purchaseService.generatePurchaseId();
             lblPurchaseId.setText(purchaseId);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -177,7 +177,7 @@ public class ChashierPurchaseFormController {
     private void loadCustomerIds() {
         try {
             ObservableList<String> observableList = FXCollections.observableArrayList();
-            ArrayList<String> idList = CustomerModel.loadCustomerIds();
+            ArrayList<String> idList = purchaseService.loadCustomer();
 
             for (String id : idList) {
                 observableList.add(id);
@@ -208,8 +208,11 @@ public class ChashierPurchaseFormController {
     public void cmbICustomerOnAction(ActionEvent actionEvent) {
         String code = String.valueOf(cmbCustomerId.getValue());
         try {
-            Customer customer = CustomerModel.SearchId(code);
-            fillCustomerFields(customer);
+            Optional<Customer> customer  = purchaseService.SearchCustomer(code);
+            if (customer.isPresent()){
+                customer.get();
+            }
+            fillCustomerFields(customer.get());
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -217,8 +220,11 @@ public class ChashierPurchaseFormController {
     public void cmbItemOnAction(ActionEvent actionEvent) {
         String code = String.valueOf(cmbItemCode.getValue());
         try {
-            Spice item = SpiceModel.SearchId(code);
-            fillItemFields(item);
+            Optional<Spice> item = purchaseService.SearchSpice(code);
+            if (item.isPresent()) {
+                item.get();
+            }
+            fillItemFields(item.get());
             txtQty.requestFocus();
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);

@@ -8,19 +8,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.SpiceModel;
-import lk.ijse.SpiceWholesaleShop.model.SpiceModel;
-import lk.ijse.SpiceWholesaleShop.to.Spice;
-import lk.ijse.SpiceWholesaleShop.to.User;
+import lk.ijse.SpiceWholesaleShop.entity.Spice;
+import lk.ijse.SpiceWholesaleShop.service.cutom.SpiceService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.SpiceFormServiceImpl;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 import lk.ijse.SpiceWholesaleShop.util.Service;
-import sun.security.provider.ConfigFile;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class AdminSpiceFormController {
     public AnchorPane Product;
@@ -44,6 +42,8 @@ public class AdminSpiceFormController {
     boolean isMatchUnitPrice = false;
     boolean isMatchPurchasePrice = false;
 
+    SpiceService spiceService=new SpiceFormServiceImpl();
+
     public void initialize() {
         loadTableData();
     }
@@ -59,13 +59,11 @@ public class AdminSpiceFormController {
 
     private void refreshTableData() {
         try {
-            ArrayList<Spice> product = SpiceModel.getAllproduct();
+            List<Spice> product = spiceService.findSpice();
             ObservableList<Spice> productObservableList = FXCollections.observableArrayList();
             productObservableList.addAll(product);
             tblProduct.setItems(productObservableList);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -209,11 +207,9 @@ public class AdminSpiceFormController {
         Spice spice = new Spice(productId, purchasePrice, unitPrice, QtyOnHand, Description);
         boolean isAdded = false;
         try {
-            isAdded = SpiceModel.Add(spice);
+             isAdded = spiceService.saveSpice(spice);
             refreshTableData();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         if (isAdded) {
@@ -241,11 +237,9 @@ public class AdminSpiceFormController {
             Spice spice = new Spice(productId, purchasePrice, unitPrice, QtyOnHand, Description);
             boolean isUpdated = false;
             try {
-                isUpdated = SpiceModel.Update(spice);
+                isUpdated = spiceService.updateSpice(spice);
                 refreshTableData();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             if (isUpdated) {
@@ -259,7 +253,7 @@ public class AdminSpiceFormController {
     public void btnDelete(ActionEvent actionEvent) {
         String productId = txtId.getText();
         try {
-            boolean isDeleted = SpiceModel.Delete(productId);
+            boolean isDeleted = spiceService.deleteSpice(productId);;
             refreshTableData();
             if (isDeleted){
                 JOptionPane.showMessageDialog(null,"Successfully Deleted..!");
@@ -267,8 +261,6 @@ public class AdminSpiceFormController {
                 JOptionPane.showMessageDialog(null,"Unsuccessful..!");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -280,31 +272,8 @@ public class AdminSpiceFormController {
     public void btnSearch(ActionEvent actionEvent) {
         String Search = IdSearch.getText();
         try {
-            Spice spice= SpiceModel.SearchId(Search);
-            if (spice==null){
-                spice= SpiceModel.SearchPurechasePrice(Search);
-                if (spice == null) {
-                    spice= SpiceModel.SearchUnitPrice(Search);
-                    if (spice == null) {
-                        spice= SpiceModel.SearchQtyOnHand(Search);
-                        if (spice==null){
-                            spice= SpiceModel.SearchDescription(Search);
-                        }
-                    }
-                }
-            }
-            if (spice!=null){
-                txtId.setText(spice.getItemCode());
-                txtPurchasePrice.setText(spice.getPurchasePrice()+"");
-                txtUnitPrice.setText(spice.getUnitPrice()+"");
-                txtQtyOnHand.setText(spice.getQtyOnHand()+"");
-                txtDescription.setText(spice.getDescription());
-            }else{
-                new Alert(Alert.AlertType.CONFIRMATION, "Product Not Found..!").show();
-            }
+            List<Spice> search = spiceService.searchSpice(Search);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 

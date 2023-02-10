@@ -197,7 +197,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Text>
-            <Button layoutX="309.0" layoutY="207.0" mnemonicParsing="false" onAction="#btnPlacePurchaseOnAction" prefHeight="44.0" prefWidth="237.0" style="-fx-background-color: #27ae60; -fx-background-radius: 10;" text="Place Purchase" textFill="#eee1e1">
+            <Button layoutX="309.0" layoutY="207.0" mnemonicParsing="false" onAction="#btnPlaceOrderOnAction" prefHeight="44.0" prefWidth="237.0" style="-fx-background-color: #27ae60; -fx-background-radius: 10;" text="Place Order" textFill="#eee1e1">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>

@@ -7,8 +7,10 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import lk.ijse.SpiceWholesaleShop.model.*;
-import lk.ijse.SpiceWholesaleShop.to.*;
+import lk.ijse.SpiceWholesaleShop.entity.Spice;
+import lk.ijse.SpiceWholesaleShop.entity.Customer;
+import lk.ijse.SpiceWholesaleShop.service.cutom.OrderService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.OrderFormServiceImpl;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 import lk.ijse.SpiceWholesaleShop.tm.AddOrderTm;
@@ -44,6 +46,8 @@ public class AdminOrderFormController {
     public TableColumn colTotal;
     public TableColumn colAction;
     public TableColumn colPurchasePrice;
+
+    OrderService orderService=new OrderFormServiceImpl();
     private ObservableList<AddOrderTm> obList = FXCollections.observableArrayList();
 
     public void initialize(){
@@ -131,6 +135,9 @@ public class AdminOrderFormController {
             new Alert(Alert.AlertType.ERROR, "UI Not Found!").show();
         }
     }
+
+    public void btnPlaceOrderOnAction(ActionEvent actionEvent) {
+    }
     private void loadOrderDate() {
         lblOrderDate.setText(String.valueOf(LocalDate.now()));
     }
@@ -138,8 +145,12 @@ public class AdminOrderFormController {
     public void cmbItemOnAction(ActionEvent actionEvent) {
         String code = String.valueOf(cmbItemCode.getValue());
         try {
-            Spice item = SpiceModel.SearchId(code);
-            fillItemFields(item);
+            Optional<Spice> item = orderService.SearchSpice(code);
+            if (item.isPresent()){
+                item.get();
+            }
+
+            fillItemFields(item.get());
             txtQty.requestFocus();
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -148,7 +159,7 @@ public class AdminOrderFormController {
     public void LoadProductCode(){
         try {
             ObservableList<String> observableList = FXCollections.observableArrayList();
-            ArrayList<String> itemList = SpiceModel.loadItemCodes();
+            ArrayList<String> itemList = orderService.LoadItem();
 
             for (String code : itemList) {
                 observableList.add(code);
@@ -160,7 +171,7 @@ public class AdminOrderFormController {
     }
     private void loadNextOrderId() {
         try {
-            String orderId = OrderModel.generateNextOrderId();
+            String orderId = orderService.generateOrderId();
             lblOrderId.setText(orderId);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -169,7 +180,7 @@ public class AdminOrderFormController {
     private void loadCustomerIds() {
         try {
             ObservableList<String> observableList = FXCollections.observableArrayList();
-            ArrayList<String> idList = CustomerModel.loadCustomerIds();
+            ArrayList<String> idList = orderService.loadCustomer();
 
             for (String id : idList) {
                 observableList.add(id);
@@ -207,42 +218,17 @@ public class AdminOrderFormController {
     public void cmbICustomerOnAction(ActionEvent actionEvent) {
         String code = String.valueOf(cmbCustomerId.getValue());
         try {
-            Customer customer = CustomerModel.SearchId(code);
-            fillCustomerFields(customer);
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public void btnPlaceOrderOnAction(ActionEvent actionEvent) {
-        String orderId = lblOrderId.getText();
-        String customerId = String.valueOf(cmbCustomerId.getValue());
-        String description=lblDescription.getText();
-        ArrayList<CartDetail> cartDetails = new ArrayList<>();
-
-        /* load all cart items' to orderDetails arrayList */
-        for (int i = 0; i < tblAddOrder.getItems().size(); i++) {
-            /* get each row details to (PlaceOrderTm)lk.ijse.SpiceWholesaleShop.tm in each time and add them to the orderDetails */
-            AddOrderTm tm = obList.get(i);
-            cartDetails.add(new CartDetail(orderId, tm.getItemCode(),tm.getQty(), tm.getUnitPrice(),tm.getTotal()));
-        }
-
-        PlaceOrder placeOrder = new PlaceOrder(customerId, orderId,description ,cartDetails);
-        try {
-            boolean isPlaced = PlaceOrderModel.placeOrder(placeOrder);
-            if (isPlaced) {
-                /* to clear table */
-                obList.clear();
-                loadNextOrderId();
-                new Alert(Alert.AlertType.CONFIRMATION, "Order Placed!").show();
-            } else {
-                new Alert(Alert.AlertType.ERROR, "Order Not Placed!").show();
+            OrderFormServiceImpl orderFormService = new OrderFormServiceImpl();
+            Optional<Customer> customer = orderFormService.SearchCustomer(code);
+            if (customer.isPresent()){
+                customer.get();
             }
+            fillCustomerFields(customer.get());
         } catch (SQLException | ClassNotFoundException e) {
-            System.out.println(e);
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
+
     public void add(ActionEvent actionEvent) {
         String OrderId = lblOrderId.getText();
         String itemCode = String.valueOf(cmbItemCode.getValue());

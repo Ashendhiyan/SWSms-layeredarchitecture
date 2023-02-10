@@ -6,14 +6,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Paint;
-import lk.ijse.SpiceWholesaleShop.model.UserModel;
-import lk.ijse.SpiceWholesaleShop.to.User;
+import lk.ijse.SpiceWholesaleShop.dto.UserDTO;
+import lk.ijse.SpiceWholesaleShop.entity.User;
+import lk.ijse.SpiceWholesaleShop.service.cutom.LoginService;
+import lk.ijse.SpiceWholesaleShop.service.cutom.impl.LoginServiceImpl;
 import lk.ijse.SpiceWholesaleShop.util.Navigation;
 import lk.ijse.SpiceWholesaleShop.util.Routes;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class LoginFormController {
@@ -22,6 +24,7 @@ public class LoginFormController {
     public TextField txtUserName;
     public TextField txtPassword;
     public ComboBox cmbRank;
+
 
     public void initialize() {
         String[] rank = {"Admin", "Cashier"};
@@ -45,7 +48,9 @@ public class LoginFormController {
                         String name = txtUserName.getText();
                         String pass = txtPassword.getText();
 
-                        User user = UserModel.SearchName(name);
+                        LoginService loginService=new LoginServiceImpl();
+                        UserDTO user = loginService.SearchName(name);
+
                         if (user == null) {
                             new Alert(Alert.AlertType.WARNING, "Wrong Name..Try Again").show();
                         } else {
@@ -64,7 +69,7 @@ public class LoginFormController {
                             }
                         }
                     }
-                } catch (SQLException | IOException | ClassNotFoundException e) {
+                } catch (SQLException | IOException e) {
                     throw new RuntimeException(e);
                 }
 

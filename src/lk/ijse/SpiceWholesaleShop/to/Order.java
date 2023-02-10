@@ -22,7 +22,8 @@ public class Order {
         this.description = description;
     }
 
-
+    public Order(String orderId, String id, LocalDate now, String customerId) {
+    }
 
     public String getOrderId() {
         return orderId;

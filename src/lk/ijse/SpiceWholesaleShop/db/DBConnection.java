@@ -8,12 +8,16 @@ public class DBConnection {
     private static DBConnection dbConnection;
     private Connection connection;
 
-    private DBConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        connection = DriverManager.getConnection("jdbc:mysql://localhost/SpiceWholesaleShop", "root", "1234");
+    private DBConnection() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost/SpiceWholesaleShop", "root", "1234");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static DBConnection getInstance() throws SQLException, ClassNotFoundException {
+    public static DBConnection getInstance() throws SQLException {
         return (null == dbConnection) ? dbConnection = new DBConnection() : dbConnection;
     }
     public Connection getConnection() {

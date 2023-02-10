@@ -2,7 +2,8 @@
   <library name="jfoenix-8.0.10">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/src/lk/ijse/SpiceWholesaleShop/lib/jfoenix-8.0.10.jar!/" />
-      <root url="jar://$PROJECT_DIR$/src/lk/ijse/SpiceWholesaleShop/lib/mysql-connector-java-8.0.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/lk/ijse/SpiceWholesaleShop/lib/mysql-connector-java-8.0.24.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/lk/ijse/SpiceWholesaleShop/lib/fontawesomefx-8.5.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
