@@ -4,7 +4,10 @@ application to manage all the internal business procedures. This system could ma
 sales , orders (like a POS system) and rental orders.
 
 ## Technicle Stack 
-Java, JavaFX, MYSQL , Jasper reports
+* Java
+* JavaFX
+* MYSQL
+* Jasper reports
 
 ## Screenshots
 ### Login
